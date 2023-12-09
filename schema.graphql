@@ -20,15 +20,20 @@ type User
 }
 type TradingCompetiton @entity {
   id: ID!
+  name: String
   totalParticipants: BigInt!
   totalTxns: BigInt!
-  token0: Token!
-  token1: Token!
+  token0: Token
+  token1: Token
   totalVolumeInToken0: BigDecimal!
   totalVolumeInToken1: BigDecimal!
-  totalBuyTxnsToken0: BigDecimal!
-  totalBuyTxnsToken1: BigDecimal!
+  totalBuyTxnsToken0: BigInt!
+  totalBuyTxnsToken1: BigInt!
   leaderBoard: [User!]
+  pairs: [Pair!]
+  startTime:BigInt!
+  endTime:BigInt!
+  regTime:BigInt!
 }
 type UserParticipatedTradingCompetiton
   @entity { #SENDER as USER entity
@@ -36,8 +41,8 @@ type UserParticipatedTradingCompetiton
   totalTxns: BigInt!
   totalVolumeInToken0: BigDecimal!
   totalVolumeInToken1: BigDecimal!
-  totalBuyTxnsToken0: BigDecimal!
-  totalBuyTxnsToken1: BigDecimal!
+  totalBuyTxnsToken0: BigInt!
+  totalBuyTxnsToken1: BigInt!
   competition: TradingCompetiton
 }
 type BaseTradingCompFactory @entity {
@@ -46,5 +51,20 @@ type BaseTradingCompFactory @entity {
   competitions: [TradingCompetiton!]
 }
 
+type Pair @entity {
+  # pair address
+  id: ID!
 
+  # mirrored from the smart contract
+  token0: Token
+  token1: Token
+  reserve0: BigDecimal!
+  reserve1: BigDecimal!
+  totalSupply: BigDecimal!
 
+  # lifetime volume stats
+  volumeToken0: BigDecimal!
+  volumeToken1: BigDecimal!
+
+  txCount: BigInt!
+}

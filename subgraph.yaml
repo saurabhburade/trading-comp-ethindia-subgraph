@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: TradingCompFactory
-    network: scroll-sepolia
+    network: base-testnet
     source:
-      address: "0xF8c851446Bba8AD2F980166A01EC7693DE88f09e"
+      address: "0x333520684825170596C4E6755e51B0094c0A9948"
       abi: TradingCompFactory
-      startBlock: 13359812
+      startBlock: 13479068
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -16,6 +16,7 @@ dataSources:
       entities:
         - OwnershipTransferred
         - TradingCompDeployed
+        - TradingComp
       abis:
         - name: TradingCompFactory
           file: ./abis/TradingCompFactory.json
@@ -33,10 +34,52 @@ dataSources:
           handler: handleNewTradingComp
       file: ./src/mapping.ts
 
+
 templates:
   - kind: ethereum/contract
+    name: TradingComp
+    network: base-testnet
+    source:
+      abi: TradingComp
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/competition.ts
+      entities:
+        - NewCompStatus
+        - OwnershipTransferred
+        - Register
+
+      abis:
+        - name: TradingComp
+          file: ./abis/TradingComp.json
+        - name: TradingCompFactory
+          file: ./abis/TradingCompFactory.json
+        - name: UniswapPair
+          file: ./abis/UniswapPair.json
+        - name: ERC20
+          file: ./abis/ERC20ABI.json
+
+      eventHandlers:
+        - event: NewEndTime(uint256,uint256)
+          handler: handleNewEndTime
+        - event: NewPairSet(address)
+          handler: handleNewPairSet
+        - event: NewRegTime(uint256,uint256)
+          handler: handleNewRegTime
+        - event: NewStartTime(uint256,uint256)
+          handler: handleNewStartTime
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Register(address,uint256)
+          handler: handleRegister
+        - event: RemovePair(address)
+          handler: handleRemovePair
+
+  - kind: ethereum/contract
     name: UniswapPair
-    network: scroll-sepolia
+    network: base-testnet
     source:
       abi: UniswapPair
     mapping:
@@ -45,9 +88,8 @@ templates:
       language: wasm/assemblyscript
       file: ./src/mappings/pair.ts
       entities:
-        - UniswapPair
-        - Token
-        - Competition
+        - Pair
+
       abis:
         - name: UniswapPair
           file: ./abis/UniswapPair.json
@@ -57,6 +99,7 @@ templates:
           file: ./abis/ERC20ABI.json
         - name: TradingComp
           file: ./abis/TradingComp.json
+          
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint
@@ -68,37 +111,3 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
-
-  - kind: ethereum/contract
-    name: TradingComp
-    network: scroll-sepolia
-    source:
-      abi: TradingComp
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/competition.ts
-      entities:
-        - UniswapPair
-        - Token
-        - Competition
-
-      abis:
-        - name: TradingComp
-          file: ./abis/TradingComp.json
-        - name: UniswapPair
-          file: ./abis/UniswapPair.json
-        - name: TradingCompFactory
-          file: ./abis/TradingCompFactory.json
-        - name: ERC20
-          file: ./abis/ERC20ABI.json
-      eventHandlers:
-        - event: NewCompStatus(uint8)
-          handler: handleCompStatus
-        - event: NewPairSet(address)
-          handler: handleNewPairSet
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransfered
-        - event: Register(address)
-          handler: handleRegister
