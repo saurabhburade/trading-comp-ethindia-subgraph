@@ -31,14 +31,16 @@ type TradingCompetiton @entity {
   totalBuyTxnsToken1: BigInt!
   leaderBoard: [User!]
   pairs: [Pair!]
-  startTime:BigInt!
-  endTime:BigInt!
-  regTime:BigInt!
+  startTime: BigInt!
+  endTime: BigInt!
+  regTime: BigInt!
 }
 type UserParticipatedTradingCompetiton
   @entity { #SENDER as USER entity
   id: ID!
   totalTxns: BigInt!
+  participant: String!
+  competitionAddress: String!
   totalVolumeInToken0: BigDecimal!
   totalVolumeInToken1: BigDecimal!
   totalBuyTxnsToken0: BigInt!

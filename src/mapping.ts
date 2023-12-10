@@ -12,6 +12,7 @@ import {
   UniswapPair as PairTemplate,
   TradingComp as TradingCompTemplate,
 } from "../generated/templates";
+import { DataSourceContext } from "@graphprotocol/graph-ts";
 
 export function handleNewTradingComp(event: TradingCompDeployed): void {
   let tradingComp = TradingCompetiton.load(
@@ -29,6 +30,7 @@ export function handleNewTradingComp(event: TradingCompDeployed): void {
     tradingComp.startTime = ZERO_BI;
     tradingComp.endTime = ZERO_BI;
     tradingComp.regTime = ZERO_BI;
+  
     TradingCompTemplate.create(event.params.compAddress);
   }
 
