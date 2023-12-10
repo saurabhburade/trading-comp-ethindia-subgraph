@@ -42,10 +42,7 @@ export function handleNewPairSet(event: NewPairSet): void {
     tradingComp.regTime = ZERO_BI;
     tradingComp.pairs = [];
   }
-  log.info("CREATING PAIR LISTNER ", []);
-  let context = new DataSourceContext();
-  context.setString(UNISWAP_PAIR_CONTEXT_KEY, event.address.toHexString());
-  PairTemplate.createWithContext(event.params._pair, context);
+
   let pair = Pair.load(event.params._pair.toHexString());
   if (pair === null) {
     pair = new Pair(event.params._pair.toHexString());
@@ -60,9 +57,9 @@ export function handleNewPairSet(event: NewPairSet): void {
   const pairContract = UniswapPair.bind(event.params._pair);
   if (pairContract !== null) {
     const token0Address = (pairContract as UniswapPair).try_token0();
-    log.info("token0Address :::: {}", [token0Address.value.toHexString()]);
+
     const token1Address = (pairContract as UniswapPair).try_token1();
-    log.info("token0Address :::: {}", [token1Address.value.toHexString()]);
+
     if (!token0Address.reverted) {
       if (tradingComp.token0 === null) {
         saveToken(
@@ -93,9 +90,20 @@ export function handleNewPairSet(event: NewPairSet): void {
       pair.reserve0 = reserves.get_reserve0().toBigDecimal();
       pair.reserve1 = reserves.get_reserve1().toBigDecimal();
     }
+    if (
+      !token0Address.reverted &&
+      !token1Address.reverted &&
+      !reserves_try.reverted
+    ) {
+      log.info("CREATING PAIR LISTNER ", []);
+      let context = new DataSourceContext();
 
-    tradingComp.pairs = [pair.id];
-    pair.save();
+      context.setString(UNISWAP_PAIR_CONTEXT_KEY, event.address.toHexString());
+
+      PairTemplate.createWithContext(event.params._pair, context);
+      tradingComp.pairs = [pair.id];
+      pair.save();
+    }
   }
   // let parsedPairs = tradingComp.pairs;
   // if (parsedPairs !== null) {
